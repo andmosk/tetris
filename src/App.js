@@ -30,8 +30,17 @@ const Figure = ({position={x:0, y:0}, elements=[{x:0,y:0}], angle}) => {
 }
 
 class App extends Component {
+
+  componentDidMount() {
+     this.interval = setInterval(this.handleMoveDown, 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+  
   state = {
-    FigurePosition: {x:0, y:0}
+    FigurePosition: {x:0, y:0},
   }
   handleMoveRight = () => {
     console.warn('right');
@@ -47,7 +56,9 @@ class App extends Component {
     console.warn('rotate');
   }
   handleMoveDown = () => {
-    console.warn('down');    
+    console.warn('down');
+    const {y: prevY} =  this.state.FigurePosition;
+    this.setState({FigurePosition: {...this.state.FigurePosition, y: prevY + 1, }});    
   }
   handleKeyUp = (e) => {
     
@@ -72,10 +83,10 @@ class App extends Component {
   }
 
   render() {
-    const {FigurePosition} = this.state;
+    const { FigurePosition } = this.state;
     return (
       <Container onKeyUp={this.handleKeyUp} tabIndex="0">
-        <Figure elements={[{x:0, y:0}, {x:0, y: 1}]} position={FigurePosition} />
+        <Figure elements={[{x:0, y:0}, {x:0, y: 1}]} position={ FigurePosition } />
       </Container>
     );
   }
