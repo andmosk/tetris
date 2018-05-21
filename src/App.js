@@ -2,7 +2,9 @@ import React, { Component } from "react";
 import "./App.css";
 import { Container } from "./Container";
 import { Blocks } from "./Blocks";
-
+import { FIGURES } from "./figures";
+import { shuffle } from "./utils";
+const figuresName = Object.keys(FIGURES);
 class App extends Component {
   state = {
     figure: {
@@ -46,12 +48,12 @@ class App extends Component {
     const x = prevX + 1;
     const isCollision = this.checkCollision({ x });
     const isLanded = this.isLanded();
-    if (isCollision || isLanded) {
-      return;
+
+    if (!(isCollision || isLanded)) {
+      this.setState({
+        figure: { ...figure, topLeft: { ...figure.topLeft, x } }
+      });
     }
-    this.setState({
-      figure: { ...figure, topLeft: { ...figure.topLeft, x } }
-    });
   };
 
   handleMoveLeft = () => {
@@ -60,12 +62,12 @@ class App extends Component {
     const { x: prevX } = figure.topLeft;
     const x = prevX - 1;
     const isCollision = this.checkCollision({ x });
-    if (isCollision) {
-      return;
+
+    if (!isCollision) {
+      this.setState({
+        figure: { ...figure, topLeft: { ...figure.topLeft, x } }
+      });
     }
-    this.setState({
-      figure: { ...figure, topLeft: { ...figure.topLeft, x } }
-    });
   };
 
   handleRotate = () => {
@@ -75,10 +77,10 @@ class App extends Component {
     const { elements: prevElements } = figure;
     const elements = transpose(prevElements).reverse();
     const isCollision = this.checkCollision({ elements });
-    if (isCollision) {
-      return;
+
+    if (!isCollision) {
+      this.setState({ figure: { ...figure, elements } });
     }
-    this.setState({ figure: { ...figure, elements } });
   };
 
   handleMoveDown = () => {
@@ -86,23 +88,32 @@ class App extends Component {
     const { figure, landed: prevLanded } = this.state;
     const { elements, topLeft } = figure;
     const { y: prevY } = topLeft;
+
     const y = prevY + 1;
     const isLanded = this.isLanded(y);
 
     if (isLanded) {
-      console.log("land", prevLanded);
+      console.warn("landed");
       const landed = prevLanded.map(arr => arr.slice());
 
       const offsetLeft = topLeft.x;
+
       elements.forEach((row, i) => {
         const offsetTop = topLeft.y + i;
         row.forEach(
           (square, j) => square && (landed[offsetTop][j + offsetLeft] = 1)
         );
       });
-      console.log(landed);
+
+      const nextFigureName = shuffle(figuresName)[0];
+      const nextFigure = FIGURES[nextFigureName];
+
       this.setState({
-        figure: { ...figure, topLeft: { ...topLeft, y: 0 } },
+        figure: {
+          ...figure,
+          topLeft: { ...topLeft, y: 0 },
+          elements: nextFigure
+        },
         landed
       });
     } else {
