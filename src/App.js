@@ -6,8 +6,8 @@ import { Blocks } from "./Blocks";
 class App extends Component {
   state = {
     figure: {
-      topLeft: { x: 0, y: 0 },
-      elements: [[1, 0, 0], [1, 1, 1]]
+      topLeft: { x: 3, y: 0 },
+      elements: [[1, 1, 1]]
     },
     size: {
       width: 10,
@@ -19,7 +19,22 @@ class App extends Component {
   componentDidMount() {
     // this.interval = setInterval(this.handleMoveDown, 1000);
   }
+  componentDidUpdate(prevProps, prevState) {
+    const { landed, size } = this.state;
 
+    const completedRowIndex = landed.findIndex(row =>
+      row.every(block => block === 1)
+    );
+    if (completedRowIndex !== -1) {
+      console.log("completed", completedRowIndex);
+      const newLanded = [
+        Array(size.width).fill(0),
+        ...landed.slice(0, completedRowIndex),
+        ...landed.slice(completedRowIndex + 1)
+      ];
+      this.setState({ landed: newLanded });
+    }
+  }
   componentWillUnmount() {
     clearInterval(this.interval);
   }
@@ -172,7 +187,6 @@ class App extends Component {
           blockSize={50}
           prefix={"figure-"}
         />
-
         <Blocks blocks={landed} prefix={"landed-"} blockSize={50} />
       </Container>
     );
