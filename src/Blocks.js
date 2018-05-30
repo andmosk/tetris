@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { calculatePosition } from "./utils";
+import { convert2px, getBlocksPosition } from "./utils";
 import { Block } from "./Block";
 
 export const Blocks = ({
@@ -8,25 +8,13 @@ export const Blocks = ({
   position = { x: 0, y: 0 },
   prefix
 }) => {
-  const blocksPosition = [];
-  blocks.forEach((row, rowIndex) => {
-    row.forEach((square, squareIndex) => {
-      if (square) {
-        blocksPosition.push({ x: squareIndex, y: rowIndex });
-      }
-    });
-  });
+  const blocksPosition = getBlocksPosition(blocks);
 
   const mappedBlocks = blocksPosition.map((element, index) => {
-    return (
-      <Block
-        key={prefix + index}
-        top={calculatePosition(element.y, position.y, blockSize)}
-        left={calculatePosition(element.x, position.x, blockSize)}
-      >
-        {index}
-      </Block>
-    );
+    const top = convert2px(element.y, position.y, blockSize);
+    const left = convert2px(element.x, position.x, blockSize);
+    return <Block key={prefix + index} top={top} left={left} />;
   });
+
   return <Fragment>{mappedBlocks}</Fragment>;
 };
