@@ -1,8 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import App from "./App";
 import registerServiceWorker from "./registerServiceWorker";
+import { MainContainer } from "./MainContainer";
 
 ReactDOM.render(
   <div
@@ -13,7 +13,7 @@ ReactDOM.render(
       alignItems: "center"
     }}
   >
-    <App />
+    <MainContainer />
   </div>,
   document.getElementById("root")
 );
