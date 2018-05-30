@@ -3,7 +3,7 @@ import "./App.css";
 import { Container } from "./Container";
 import { Blocks } from "./Blocks";
 import { FIGURES } from "./figures";
-import { shuffle } from "./utils";
+import { shuffle, calcBlockSize } from "./utils";
 const figuresName = Object.keys(FIGURES);
 class App extends Component {
   state = {
@@ -19,9 +19,24 @@ class App extends Component {
   };
 
   componentDidMount() {
-    // this.interval = setInterval(this.handleMoveDown, 1000);
+    //this.interval = setInterval(this.handleMoveDown, 1000);
   }
   componentDidUpdate(prevProps, prevState) {
+    if (this.props !== prevProps) {
+      const { action } = this.props;
+      if (action === "left") {
+        this.handleMoveVertically(action);
+      }
+      if (action === "right") {
+        this.handleMoveVertically(action);
+      }
+      if (action === "rotate") {
+        this.handleRotate();
+      }
+      if (action === "down") {
+        this.handleMoveDown();
+      }
+    }
     const { landed, size } = this.state;
 
     const completedRowIndex = landed.findIndex(row =>
@@ -38,32 +53,17 @@ class App extends Component {
     }
   }
   componentWillUnmount() {
-    clearInterval(this.interval);
+    // clearInterval(this.interval);
   }
-
-  handleMoveRight = () => {
-    console.warn("right");
+  handleMoveVertically = direction => {
+    const num = direction === "left" ? -1 : 1;
     const { figure } = this.state;
     const { x: prevX } = figure.topLeft;
-    const x = prevX + 1;
+    const x = prevX + num;
     const isCollision = this.checkCollision({ x });
     const isLanded = this.isLanded();
 
     if (!(isCollision || isLanded)) {
-      this.setState({
-        figure: { ...figure, topLeft: { ...figure.topLeft, x } }
-      });
-    }
-  };
-
-  handleMoveLeft = () => {
-    console.warn("left");
-    const { figure } = this.state;
-    const { x: prevX } = figure.topLeft;
-    const x = prevX - 1;
-    const isCollision = this.checkCollision({ x });
-
-    if (!isCollision) {
       this.setState({
         figure: { ...figure, topLeft: { ...figure.topLeft, x } }
       });
@@ -161,44 +161,32 @@ class App extends Component {
         (square, i) => square + landed[offsetTop][i + offsetLeft] === 2
       );
     });
-
     return isCollision;
   };
 
-  handleKeyUp = event => {
-    if (event.which === 65 || event.which === 37) {
-      this.handleMoveLeft();
-    }
-
-    if (event.which === 68 || event.which === 39) {
-      this.handleMoveRight();
-    }
-
-    if (event.which === 87 || event.which === 38) {
-      this.handleRotate();
-    }
-
-    if (event.which === 83 || event.which === 40) {
-      this.handleMoveDown();
-    }
-  };
-
   render() {
+    const blockSize = calcBlockSize(
+      this.props.size.width,
+      this.props.size.height,
+      10,
+      16,
+      50
+    );
     const { figure, size, landed } = this.state;
     return (
       <Container
         onKeyUp={this.handleKeyUp}
         tabIndex="0"
-        height={50 * size.height}
-        width={50 * size.width}
+        height={blockSize * size.height}
+        width={blockSize * size.width}
       >
         <Blocks
           blocks={figure.elements}
           position={figure.topLeft}
-          blockSize={50}
+          blockSize={blockSize}
           prefix={"figure-"}
         />
-        <Blocks blocks={landed} prefix={"landed-"} blockSize={50} />
+        <Blocks blocks={landed} prefix={"landed-"} blockSize={blockSize} />
       </Container>
     );
   }

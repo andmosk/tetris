@@ -47,3 +47,15 @@ export const getBlocksPosition = blocks => {
   });
   return blocksPosition;
 };
+
+export const calcBlockSize = (width, height, gridWidth, gridHeight, offset) => {
+  width = offset ? width - offset : width;
+  height = height ? height - offset : height;
+  const size = Math.floor(width / gridWidth);
+  if (size * gridHeight < height) {
+    console.log(size);
+    return size;
+  } else {
+    return Math.floor(height / gridHeight);
+  }
+};
