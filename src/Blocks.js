@@ -13,7 +13,9 @@ export const Blocks = ({
   const mappedBlocks = blocksPosition.map((element, index) => {
     const top = convert2px(element.y, position.y, blockSize);
     const left = convert2px(element.x, position.x, blockSize);
-    return <Block key={prefix + index} top={top} left={left} />;
+    return (
+      <Block key={prefix + index} top={top} left={left} blockSize={blockSize} />
+    );
   });
 
   return <Fragment>{mappedBlocks}</Fragment>;
